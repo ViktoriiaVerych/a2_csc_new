@@ -1,0 +1,7 @@
+﻿  csc2_server.cpp
+C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(38,55): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(45,53): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(53,62): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(62,53): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(121,65): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+  csc2_server.vcxproj -> C:\Users\Admin\source\repos\csc2_f\csc2_server\x64\Debug\csc2_server.exe
