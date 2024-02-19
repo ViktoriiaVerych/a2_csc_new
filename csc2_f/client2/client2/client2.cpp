@@ -1,5 +1,4 @@
-﻿
-#include <iostream>
+﻿#include <iostream>
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
 #include <fstream>
@@ -51,6 +50,8 @@ void handleServerConnection(SOCKET clientSocket) {
     closesocket(clientSocket);
 }
 
+
+
 int main()
 {
     WSADATA wsaData;
@@ -98,10 +99,6 @@ int main()
         std::getline(std::cin, command);
 
         send(clientSocket, command.c_str(), static_cast<int>(command.size()), 0);
-
-        if (command == "EXIT") {
-            break;
-        }
 
         char buffer[1024];
         memset(buffer, 0, 1024);
