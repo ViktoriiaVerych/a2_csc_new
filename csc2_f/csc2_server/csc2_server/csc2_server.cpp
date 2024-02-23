@@ -1,44 +1,44 @@
 ﻿#include <iostream>
 #include <WinSock2.h>
+#include <Ws2tcpip.h>
 #include <fstream>
 #include <vector>
 #include <sstream>
 #include <thread>
 #include <mutex>
-#include <algorithm>
 
 #pragma comment(lib, "ws2_32.lib")
 
 const std::string SERVER_DIR = "s_storage/";
 
-std::mutex mtx;
-
-void sendFileList(SOCKET clientSocket, const std::string& clientName) {
-    std::vector<std::string> files;
+void sendFileList(SOCKET clientSocket, const std::string& clientDir) {
     std::string fileList;
-
-    WIN32_FIND_DATAA fileData;
-    HANDLE hFind;
-    hFind = FindFirstFileA((SERVER_DIR + clientName + "/*").c_str(), &fileData);
+    WIN32_FIND_DATAA findData;
+    HANDLE hFind = FindFirstFileA((SERVER_DIR + clientDir + "\\*").c_str(), &findData);
 
     if (hFind != INVALID_HANDLE_VALUE) {
         do {
-            if (!(fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-                files.push_back(fileData.cFileName);
+            if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+                fileList += findData.cFileName;
+                fileList += '\n';
             }
-        } while (FindNextFileA(hFind, &fileData));
+        } while (FindNextFileA(hFind, &findData));
         FindClose(hFind);
     }
 
-    for (const auto& file : files) {
-        fileList += file + "\n";
+    int bytesSent = send(clientSocket, fileList.c_str(), fileList.size(), 0);
+    if (bytesSent == SOCKET_ERROR)
+    {
+        std::cerr << "send failed with error: " << WSAGetLastError() << std::endl;
     }
-
-    send(clientSocket, fileList.c_str(), fileList.size(), 0);
+    else
+    {
+        std::cout << "Sent " << bytesSent << " bytes" << std::endl;
+    }
 }
 
-void sendFile(SOCKET clientSocket, const std::string& clientName, const std::string& filename) {
-    std::ifstream file(SERVER_DIR + clientName + "/" + filename, std::ios::binary | std::ios::ate);
+void sendFile(SOCKET clientSocket, const std::string& clientDir, const std::string& filename) {
+    std::ifstream file(SERVER_DIR + clientDir + "\\" + filename, std::ios::binary | std::ios::ate);
     if (!file.is_open()) {
         std::string error = "file does not exist";
         send(clientSocket, error.c_str(), error.size(), 0);
@@ -49,13 +49,21 @@ void sendFile(SOCKET clientSocket, const std::string& clientName, const std::str
 
     std::vector<char> fileBuffer(fileSize);
     if (file.read(fileBuffer.data(), fileSize)) {
-        send(clientSocket, fileBuffer.data(), fileBuffer.size(), 0);
+        int bytesSent = send(clientSocket, fileBuffer.data(), fileBuffer.size(), 0);
+        if (bytesSent == SOCKET_ERROR)
+        {
+            std::cerr << "send failed with error: " << WSAGetLastError() << std::endl;
+        }
+        else
+        {
+            std::cout << "Sent " << bytesSent << " bytes" << std::endl;
+        }
     }
     file.close();
 }
 
-void receiveFile(SOCKET clientSocket, const std::string& clientName, const std::string& filename) {
-    std::ofstream file(SERVER_DIR + clientName + "/" + filename, std::ios::binary);
+void receiveFile(SOCKET clientSocket, const std::string& clientDir, const std::string& filename) {
+    std::ofstream file(SERVER_DIR + clientDir + "\\" + filename, std::ios::binary);
     if (!file.is_open()) {
         std::string error = "error creating file";
         send(clientSocket, error.c_str(), error.size(), 0);
@@ -64,62 +72,53 @@ void receiveFile(SOCKET clientSocket, const std::string& clientName, const std::
 
     char buffer[1024];
     int bytesRead;
+    int totalBytesRead = 0;
     while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
         file.write(buffer, bytesRead);
+        totalBytesRead += bytesRead;
     }
 
     file.close();
+    std::cout << "Received " << totalBytesRead << " bytes" << std::endl;
 }
 
-void deleteFile(const std::string& clientName, const std::string& filename) {
-    std::string filePath = SERVER_DIR + clientName + "/" + filename;
+void deleteFile(const std::string& clientDir, const std::string& filename) {
+    std::string filePath = SERVER_DIR + clientDir + "\\" + filename;
     if (remove(filePath.c_str()) != 0) {
         std::cerr << "error deleting file: " << filename << std::endl;
     }
 }
 
-void handleClientConnection(SOCKET clientSocket) {
+void clientHandler(SOCKET clientSocket) {
     char buffer[1024];
     memset(buffer, 0, 1024);
     int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
     if (bytesReceived > 0)
     {
-        std::string clientName(buffer);
+        std::cout << "received data:" << buffer << std::endl;
 
-        std::cout << "Client connected: " << clientName << std::endl;
+        std::istringstream iss(buffer);
+        std::string clientName, command, filename;
+        iss >> clientName >> command >> filename;
 
-        while (true) {
-            memset(buffer, 0, 1024);
-            bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
-            if (bytesReceived > 0)
-            {
-                std::istringstream iss(buffer);
-                std::string command;
-                iss >> command;
+        std::string clientDir = clientName;
+        CreateDirectoryA((SERVER_DIR + clientDir).c_str(), NULL);
 
-                if (command == "GET") {
-                    std::string filename;
-                    iss >> filename;
-                    sendFile(clientSocket, clientName, filename);
-                }
-                else if (command == "LIST") {
-                    sendFileList(clientSocket, clientName);
-                }
-                else if (command == "PUT") {
-                    std::string filename;
-                    iss >> filename;
-                    receiveFile(clientSocket, clientName, filename);
-                }
-                else if (command == "DELETE") {
-                    std::string filename;
-                    iss >> filename;
-                    deleteFile(clientName, filename);
-                }
-                else {
-                    std::string error = "Invalid command";
-                    send(clientSocket, error.c_str(), error.size(), 0);
-                }
-            }
+        if (command == "GET") {
+            sendFile(clientSocket, clientDir, filename);
+        }
+        else if (command == "LIST") {
+            sendFileList(clientSocket, clientDir);
+        }
+        else if (command == "PUT") {
+            receiveFile(clientSocket, clientDir, filename);
+        }
+        else if (command == "DELETE") {
+            deleteFile(clientDir, filename);
+        }
+        else {
+            std::string error = "Invalid command";
+            send(clientSocket, error.c_str(), error.size(), 0);
         }
     }
 
@@ -177,7 +176,7 @@ int main()
             return 1;
         }
 
-        std::thread clientThread(handleClientConnection, clientSocket);
+        std::thread clientThread(clientHandler, clientSocket);
         clientThread.detach();
     }
 
