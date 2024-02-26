@@ -1,10 +1,10 @@
 ﻿  csc2_server.cpp
-C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(39,54): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(47,51): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(57,59): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(66,51): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(71,50): warning C4244: аргумент: преобразование "std::streamsize" в "int", возможна потеря данных
-C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(82,59): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(86,51): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\Admin\source\repos\csc2_f\csc2_server\csc2_server\csc2_server.cpp(92,50): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-  csc2_server.vcxproj -> C:\Users\Admin\source\repos\csc2_f\csc2_server\x64\Debug\csc2_server.exe
+D:\csc2_f\csc2_server\csc2_server\csc2_server.cpp(36,54): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+D:\csc2_f\csc2_server\csc2_server\csc2_server.cpp(43,51): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+D:\csc2_f\csc2_server\csc2_server\csc2_server.cpp(52,59): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+D:\csc2_f\csc2_server\csc2_server\csc2_server.cpp(60,51): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+D:\csc2_f\csc2_server\csc2_server\csc2_server.cpp(65,50): warning C4244: аргумент: преобразование "std::streamsize" в "int", возможна потеря данных
+D:\csc2_f\csc2_server\csc2_server\csc2_server.cpp(75,59): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+D:\csc2_f\csc2_server\csc2_server\csc2_server.cpp(79,51): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+D:\csc2_f\csc2_server\csc2_server\csc2_server.cpp(84,50): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+  csc2_server.vcxproj -> D:\csc2_f\csc2_server\x64\Debug\csc2_server.exe

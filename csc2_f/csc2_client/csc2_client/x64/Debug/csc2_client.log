@@ -1,4 +1,4 @@
 ﻿  csc2_client.cpp
-C:\Users\Admin\source\repos\csc2_f\csc2_client\csc2_client\csc2_client.cpp(12,44): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\Admin\source\repos\csc2_f\csc2_client\csc2_client\csc2_client.cpp(25,33): warning C4244: аргумент: преобразование "std::streamsize" в "int", возможна потеря данных
-  csc2_client.vcxproj -> C:\Users\Admin\source\repos\csc2_f\csc2_client\x64\Debug\csc2_client.exe
+D:\csc2_f\csc2_client\csc2_client\csc2_client.cpp(13,44): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+D:\csc2_f\csc2_client\csc2_client\csc2_client.cpp(26,33): warning C4244: аргумент: преобразование "std::streamsize" в "int", возможна потеря данных
+  csc2_client.vcxproj -> D:\csc2_f\csc2_client\x64\Debug\csc2_client.exe

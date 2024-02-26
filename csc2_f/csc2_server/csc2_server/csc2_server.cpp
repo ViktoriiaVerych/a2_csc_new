@@ -8,7 +8,7 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-const std::string BASE_DIR = "C:\\Users\\Admin\\source\\repos\\csc2_f\\csc2_server\\csc2_server\\storage\\";
+const std::string BASE_DIR = "D:\\csc2_f\\csc2_server\\csc2_server\\storage";
 
 void handleClient(SOCKET clientSocket) {
 	char buffer[1024];
@@ -35,17 +35,15 @@ void handleClient(SOCKET clientSocket) {
 			}
 			send(clientSocket, fileList.c_str(), fileList.size(), 0);
 		}
-
 		else if (command.substr(0, 3) == "PUT") {
-			std::string filename = command.substr(4); 
+			std::string filename = command.substr(4);
 			std::ofstream outFile(clientDir + filename, std::ios::binary);
-			if (!outFile) {
+			if (!outFile.is_open()) {
 				std::string errMsg = "Failed to create file on server.";
 				send(clientSocket, errMsg.c_str(), errMsg.size(), 0);
 			}
 			else {
 				char fileBuffer[1024];
-				int bytesReceived;
 				while ((bytesReceived = recv(clientSocket, fileBuffer, sizeof(fileBuffer), 0)) > 0) {
 					outFile.write(fileBuffer, bytesReceived);
 				}
@@ -57,7 +55,7 @@ void handleClient(SOCKET clientSocket) {
 		else if (command.substr(0, 3) == "GET") {
 			std::string filename = command.substr(4);
 			std::ifstream inFile(clientDir + filename, std::ios::binary);
-			if (!inFile) {
+			if (!inFile.is_open()) {
 				std::string errMsg = "File not found.";
 				send(clientSocket, errMsg.c_str(), errMsg.size(), 0);
 			}
@@ -71,7 +69,7 @@ void handleClient(SOCKET clientSocket) {
 			}
 		}
 		else if (command.substr(0, 6) == "DELETE") {
-			std::string filename = command.substr(7); 
+			std::string filename = command.substr(7);
 			if (std::filesystem::remove(clientDir + filename)) {
 				std::string successMsg = "File deleted successfully.";
 				send(clientSocket, successMsg.c_str(), successMsg.size(), 0);

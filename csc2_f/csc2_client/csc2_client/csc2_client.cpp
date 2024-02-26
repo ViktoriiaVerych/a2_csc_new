@@ -3,23 +3,24 @@
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
 #include <string>
+#include <direct.h> 
 
 #pragma comment(lib, "ws2_32.lib")
 
-const std::string STORAGE_DIR = "C:\\Users\\Admin\\source\\repos\\csc2_f\\csc2_client\\csc2_client\\client_storage\\";
+const std::string STORAGE_DIR = "D:\\csc2_f\\csc2_client\\csc2_client\\client_storage";
 
 void sendCommand(SOCKET sock, const std::string& command) {
 	send(sock, command.c_str(), command.length(), 0);
 }
 
-void sendFile(SOCKET sock, const std::string& filename) {
-	std::string filePath = STORAGE_DIR + filename; 
+void sendFile(SOCKET sock, const std::string& clientDir, const std::string& filename) {
+	std::string filePath = clientDir + filename;
 	std::ifstream file(filePath, std::ios::binary);
 	if (!file.is_open()) {
 		std::cerr << "Failed to open file: " << filePath << std::endl;
 		return;
 	}
-	//CHUNK -BASED LOGIC
+	// CHUNK-BASED LOGIC
 	char buffer[1024];
 	while (file.read(buffer, sizeof(buffer)) || file.gcount() > 0) {
 		send(sock, buffer, file.gcount(), 0);
@@ -29,8 +30,8 @@ void sendFile(SOCKET sock, const std::string& filename) {
 	file.close();
 }
 
-void receiveFile(SOCKET sock, const std::string& filename) {
-	std::string filePath = STORAGE_DIR + "received_" + filename; 
+void receiveFile(SOCKET sock, const std::string& clientDir, const std::string& filename) {
+	std::string filePath = clientDir + "received_" + filename;
 	std::ofstream file(filePath, std::ios::binary);
 	if (!file.is_open()) {
 		std::cerr << "Failed to create file: " << filePath << std::endl;
@@ -58,8 +59,20 @@ int main() {
 
 	connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr));
 
-	std::string clientName = "Client1";
-	sendCommand(sock, clientName); 
+	// Get client name and create a folder for the client
+	std::cout << "Enter a client name: ";
+	std::string clientName;
+	std::getline(std::cin, clientName);
+
+	std::string clientDir = STORAGE_DIR + clientName + "\\";
+	if (_mkdir(clientDir.c_str()) == 0) {
+		std::cout << "Folder for client created: " << clientDir << std::endl;
+	}
+	else {
+		std::cerr << "Failed to create folder for client: " << clientDir << std::endl;
+	}
+
+	sendCommand(sock, clientName);
 
 	std::string command;
 	while (true) {
@@ -71,16 +84,16 @@ int main() {
 		}
 		else if (command.substr(0, 3) == "PUT") {
 			std::string filename = command.substr(4);
-			sendCommand(sock, command); 
-			sendFile(sock, filename);
+			sendCommand(sock, command);
+			sendFile(sock, clientDir, filename);
 		}
 		else if (command.substr(0, 3) == "GET") {
-			sendCommand(sock, command); 
+			sendCommand(sock, command);
 			std::string filename = command.substr(4);
-			receiveFile(sock, filename); 
+			receiveFile(sock, clientDir, filename);
 		}
 		else {
-			sendCommand(sock, command); 
+			sendCommand(sock, command);
 		}
 
 		char buffer[1024] = { 0 };
